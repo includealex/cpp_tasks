@@ -9,23 +9,26 @@
 
 namespace COW {
 
-template<typename CharT, typename Allocator = std::allocator<CharT>>
+template<typename CharT>
 class my_str_COW final {
  public:
-    my_str_COW() : _buff{std::make_shared<storage>()}, _begin{0}, _end{0} {}
-
-    template<std::size_t N>
-    explicit my_str_COW (const CharT (&str)[N]) : _buff{std::make_shared<storage>(N-1)}, _begin{0}, _end{N-2} {
-        std::copy(str, str + (N - 1), _buff->begin());
+    my_str_COW() : _buff{std::make_shared<storage>(1)}, _begin{0}, _end{0} {
+        (*_buff)[0] = '\0';  // null-terminate empty cow string
     }
 
-    my_str_COW(const my_str_COW& other, std::size_t begin, std::size_t end) : _buff{other._buff}, _begin{begin}, _end{end} {
+    template<std::size_t N>
+    explicit my_str_COW (const CharT (&str)[N]) : _begin{0}, _end{N - 2}, _buff{std::make_shared<storage>(N)} {
+        std::copy(str, str + (N - 1), _buff->begin());
+        (*_buff)[N - 1] = '\0';  // append the null terminator
+    }
+
+    my_str_COW(const my_str_COW& other, std::size_t begin, std::size_t end) : _begin{begin}, _end{end}, _buff{other._buff} {
         if (begin > end || begin < 0 || end >= other.size()) {
             throw std::out_of_range("Invalid range for substring!");
         }
     }
 
-    my_str_COW(my_str_COW&& other) noexcept : _buff{std::move(other._buff)}, _begin{other._begin}, _end{other._end} {
+    my_str_COW(my_str_COW&& other) noexcept : _begin{other._begin}, _end{other._end}, _buff{std::move(other._buff)} {
         other._begin = 0;
         other._end = 0;
     }
@@ -60,7 +63,7 @@ class my_str_COW final {
     }
 
     std::size_t size() const {
-        return _end - _begin + 1;
+        return _end - _begin + 1;  // Size does not include the null terminator
     }
 
     CharT operator[](std::size_t index) const {
@@ -75,9 +78,10 @@ class my_str_COW final {
     }
 
     my_str_COW substr(std::size_t begin, std::size_t end) {
-        if( begin > end ) {
-            throw std::invalid_argument{ "substr(): The substring has range [begin,end]. End should be greater or equal to begin" };
+        if (begin > end || begin < 0 || end >= size()) {
+            throw std::out_of_range("Invalid range for substring");
         }
+
         begin += offset();
         end += offset();
         return my_str_COW(*this, begin, end);
@@ -90,12 +94,56 @@ class my_str_COW final {
         return static_cast<void*>(&_buff->at(offset()));
     }
 
+    my_str_COW concat(const my_str_COW& other) const {
+        std::size_t new_size = size() + other.size();
+        auto new_buff = std::make_shared<storage>(new_size + 1);  // +1 for null terminator
+
+        std::copy(_buff->begin() + offset(), _buff->begin() + offset() + size(), new_buff->begin());
+        std::copy(other._buff->begin() + other.offset(), other._buff->begin() + other.offset() + other.size(), new_buff->begin() + size());
+
+        (*new_buff)[new_size] = '\0';  // Null-terminate
+
+        return my_str_COW(new_buff, 0, new_size - 1);
+    }
+
+    std::size_t search(const my_str_COW& substr) const {
+        if(substr.size() > size()) {
+            throw std::out_of_range("Substring index is out of string bounds");
+        }
+
+        auto concat_str = substr.concat(*this);
+        std::vector<std::size_t> z(concat_str.size(), 0);
+        std::size_t l = 0, r = 0;
+
+        for(std::size_t i = 1; i < concat_str.size(); ++i) {
+            if (i <= r) {
+                z[i] = std::min(r - i, z[i - l]);
+            }
+
+            while (i + z[i] < concat_str.size() && concat_str[i+z[i]] == concat_str[z[i]]) {
+                ++z[i];
+            }
+
+            if(i + z[i] - 1 > r) {
+                l = i;
+                r = i + z[i] - 1;
+            }
+
+            if(z[i] == substr.size()) {
+                return i - substr.size();
+            }
+        }
+
+        std::cout << "Substring \"" << substr << "\" not found" << std::endl;
+        return -1;
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const my_str_COW& str) {
         for(auto i = 0; i < str.size(); ++i) {
             os << str[i];
         }
 
-        return os << "\0";
+        return os << '\0';
     }
 
  private:
@@ -106,20 +154,19 @@ class my_str_COW final {
 
     std::shared_ptr<storage> _buff;
 
+    my_str_COW(std::shared_ptr<storage> buff, std::size_t begin, std::size_t end) : _begin(begin), _end(end), _buff(std::move(buff)) {}
+
     void _detach() {
         if (_buff.unique()) {
             return;
         }
 
-        std::size_t new_size = size() + offset();
-        if (new_size == 0) {
-            throw std::runtime_error("Cannot detach: new buffer size is zero.");
-        }
+        std::size_t new_size = _buff->size();  // include null terminator
 
         auto new_buff = std::make_shared<storage>(new_size);
-        std::copy(_buff->begin(), _buff->begin() + new_size, new_buff->begin());
+        std::copy(_buff->begin(), _buff->end(), new_buff->begin());
         _buff = new_buff;
-
+    
         return;
     }
 
@@ -127,8 +174,6 @@ class my_str_COW final {
         if (index >= size()) {
             throw std::out_of_range("Index out of bounds");
         }
-
-        return;
     }
 };
 

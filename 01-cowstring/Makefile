@@ -1,5 +1,5 @@
 CXX = clang++
-CXXFLAGS = -O3
+CXXFLAGS = -O3 -Wall -Werror
 MAIN = main.cpp
 HEADERS = my_str_COW.hpp
 EXE = a.out
