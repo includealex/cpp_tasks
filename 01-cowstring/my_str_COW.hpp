@@ -22,11 +22,7 @@ class my_str_COW final {
         (*_buff)[N - 1] = '\0';  // append the null terminator
     }
 
-    my_str_COW(const my_str_COW& other, std::size_t begin, std::size_t end) : _begin{begin}, _end{end}, _buff{other._buff} {
-        if (begin > end || begin < 0 || end >= other.size()) {
-            throw std::out_of_range("Invalid range for substring!");
-        }
-    }
+    my_str_COW(const my_str_COW& other) : _begin{other._begin}, _end{other._end}, _buff{other._buff} {};
 
     my_str_COW(my_str_COW&& other) noexcept : _begin{other._begin}, _end{other._end}, _buff{std::move(other._buff)} {
         other._begin = 0;
@@ -63,7 +59,7 @@ class my_str_COW final {
     }
 
     std::size_t size() const {
-        return _end - _begin + 1;  // Size does not include the null terminator
+        return _end - _begin + 1;  // size does not include the null terminator
     }
 
     CharT operator[](std::size_t index) const {
@@ -77,14 +73,14 @@ class my_str_COW final {
         return (*_buff)[index + offset()];
     }
 
-    my_str_COW substr(std::size_t begin, std::size_t end) {
+    my_str_COW substr(std::size_t begin, std::size_t end) const {
         if (begin > end || begin < 0 || end >= size()) {
             throw std::out_of_range("Invalid range for substring");
         }
 
         begin += offset();
         end += offset();
-        return my_str_COW(*this, begin, end);
+        return my_str_COW(_buff, begin, end);
     }
 
     void* cur_addr() const {
@@ -143,6 +139,33 @@ class my_str_COW final {
         return result;
     }
 
+    std::vector<my_str_COW> tokenize(const my_str_COW& delimiter) const {
+        std::vector<my_str_COW> tokens;
+
+        auto delim_idxs = search(delimiter);
+
+        if (delim_idxs.empty()) {
+            tokens.push_back(*this);
+            return tokens;
+        }
+
+        size_t start = 0;
+        auto delim_sz = delimiter.size();
+        auto str_sz = size();
+        for (auto idx : delim_idxs) {
+            if (idx > start) {
+                auto cur_el = substr(start, idx - 1);
+                tokens.push_back(cur_el); 
+            }
+            start = idx + delim_sz;
+        }
+        if (start < str_sz) {
+            auto cur_el = substr(start, str_sz - 1);
+            tokens.push_back(cur_el);
+        }
+
+        return tokens;
+    }
 
     friend std::ostream& operator<<(std::ostream& os, const my_str_COW& str) {
         for(auto i = 0; i < str.size(); ++i) {

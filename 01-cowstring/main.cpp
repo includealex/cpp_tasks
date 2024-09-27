@@ -7,7 +7,7 @@ int main() {
 
     COW::my_str_COW<char> l_letter {"l"};
     auto idxs_arr = hello_world.search(l_letter);
-    std::cout << l_letter << " first appearance indexes are : ";
+    std::cout << l_letter << " appearance indexes are : ";
     for (size_t i = 0; i < idxs_arr.size(); ++i) {
         std::cout << idxs_arr[i] << " ";
     }
@@ -26,6 +26,14 @@ int main() {
     hello[4] = 'y';
     std::cout << hello.cur_addr() << " <-- hello_world substr address after rewriting it to enjoyworld." << std::endl;
     std::cout << hello << std::endl;
+
+    COW::my_str_COW<char> fruits {"apple, peach, pineapple, watermelon"};
+    const COW::my_str_COW<char> delim {", "};
+    auto res_fruits = fruits.tokenize(delim);
+
+    for (auto fruit : res_fruits) {
+        std::cout << fruit << std::endl;
+    }
 
     return 0;
 }
