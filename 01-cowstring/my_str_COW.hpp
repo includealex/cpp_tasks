@@ -106,37 +106,43 @@ class my_str_COW final {
         return my_str_COW(new_buff, 0, new_size - 1);
     }
 
-    std::size_t search(const my_str_COW& substr) const {
-        if(substr.size() > size()) {
-            throw std::out_of_range("Substring index is out of string bounds");
+    std::vector<std::size_t> search(const my_str_COW& substr) const {
+        std::vector<std::size_t> result;
+
+        if (substr.size() > size()) {
+            throw std::out_of_range("Substring is longer than the string.");
         }
 
         auto concat_str = substr.concat(*this);
         std::vector<std::size_t> z(concat_str.size(), 0);
         std::size_t l = 0, r = 0;
 
-        for(std::size_t i = 1; i < concat_str.size(); ++i) {
+        for (std::size_t i = 1; i < concat_str.size(); ++i) {
             if (i <= r) {
                 z[i] = std::min(r - i, z[i - l]);
             }
 
-            while (i + z[i] < concat_str.size() && concat_str[i+z[i]] == concat_str[z[i]]) {
+            while (i + z[i] < concat_str.size() && concat_str[i + z[i]] == concat_str[z[i]]) {
                 ++z[i];
             }
 
-            if(i + z[i] - 1 > r) {
+            if (i + z[i] - 1 > r) {
                 l = i;
                 r = i + z[i] - 1;
             }
 
-            if(z[i] == substr.size()) {
-                return i - substr.size();
+            if (z[i] == substr.size()) {
+                result.push_back(i - substr.size());
             }
         }
 
-        std::cout << "Substring \"" << substr << "\" not found" << std::endl;
-        return -1;
+        if (result.empty()) {
+            std::cout << "Substring \"" << substr << "\" not found." << std::endl;
+        }
+
+        return result;
     }
+
 
     friend std::ostream& operator<<(std::ostream& os, const my_str_COW& str) {
         for(auto i = 0; i < str.size(); ++i) {
