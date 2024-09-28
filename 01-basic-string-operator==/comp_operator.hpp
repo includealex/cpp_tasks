@@ -5,11 +5,15 @@
 
 namespace custom {
 
-    template<typename CharT, typename Traits, typename Alloc>
-    bool operator==(const std::basic_string<CharT, Traits, Alloc>& lhs, 
-                    const std::basic_string<CharT, Traits, Alloc>& rhs);
+template<typename CharT, typename Traits1, typename Alloc1, typename Traits2, typename Alloc2>
+bool operator==(const std::basic_string<CharT, Traits1, Alloc1>& lhs,
+                const std::basic_string<CharT, Traits2, Alloc2>& rhs);
 
-} // namespace custom
+template<typename CharT, typename Traits1, typename Alloc1, typename Traits2, typename Alloc2>
+int custom_compare(const std::basic_string<CharT, Traits1, Alloc1>& lhs,
+                   const std::basic_string<CharT, Traits2, Alloc2>& rhs);
+
+} // custom
 
 #endif // COMP_OPERATOR_HPP
 
