@@ -2,14 +2,18 @@ For simlest example, run:
 
 ```bash
 
-make run_simplest
+cmake -B build -GNinja
+ninja -C build run_simplest
 
 ```
 
-For memory leaks check, run:
+For memory leaks check, add flag `-DSANITIZERS=1`
+
+For tests run:
 
 ```bash
 
-make valgrind_check
+cmake -B build -GNinja
+ninja -C build run_string_twine_test
 
 ```

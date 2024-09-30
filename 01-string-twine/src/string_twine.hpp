@@ -47,7 +47,7 @@ class string_twine {
 
     template <typename... ArgsT>
     string_twine(ArgsT&&... args) {
-        *this = _rec_concat(args ...);
+        *this = _rec_concat(std::forward<ArgsT>(args) ...);
     }
 
     size_t size() const {
@@ -81,8 +81,8 @@ class string_twine {
     }
 
     template<typename FirstT, typename... RestT>
-    static string_twine _rec_concat(FirstT& first, RestT&... rest) {
-        return _concat(string_twine(first), _rec_concat(rest...));
+    static string_twine _rec_concat(FirstT&& first, RestT&&... rest) {
+        return _concat(string_twine(std::forward<FirstT>(first)), _rec_concat(std::forward<RestT>(rest)...));
     }
 
     static string_twine _rec_concat(std::string_view last) {
@@ -92,6 +92,7 @@ class string_twine {
     static string_twine _rec_concat(const char* last) {
         return string_twine(std::string_view(last));
     }
+
 };
 
 } // namespace custom
