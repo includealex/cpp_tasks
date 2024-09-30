@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
     const std::string str2 = argv[2];
 
     auto result = my_testqual(str1, str2);
-    std::cout << "Result is " << std::boolalpha << result << std::endl;
+    std::cout << std::boolalpha << result << std::endl;
 
     return 0;
 }

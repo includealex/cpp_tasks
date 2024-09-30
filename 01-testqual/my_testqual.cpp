@@ -124,6 +124,10 @@ bool check_cv(std::vector<int>& vec1, std::vector<int>& vec2) {
     auto res1 = get_cv(vec1);
     auto res2 = get_cv(vec2);
 
+    for (size_t i = 0; i < vec1.size(); ++i) {
+        std::cout << vec1[i] << std::endl;
+    }
+
     if (res1.size() != res2.size()) {
         std::cout << "Something wrong with cv_qualifiers number" << std::endl;
         return false;
@@ -143,7 +147,43 @@ bool check_cv(std::vector<int>& vec1, std::vector<int>& vec2) {
     return true;
 }
 
+bool check_right_brackets(std::vector<int>& vec) {
+    auto it = std::find(vec.rbegin(), vec.rend(), token_type::BRACKETS);
+    if (it != vec.rend()) {
+        return true;
+    }
+
+    return false;
+}
+
+bool check_const_left_brackets(std::vector<int>& vec) {
+    if (vec.size() < 3) {
+        return false;
+    }
+    
+    auto it = std::find(vec.rbegin(), vec.rend(), token_type::BRACKETS);
+    if (it != vec.rbegin()) {
+        return false;
+    }
+
+    int secondLast = vec[vec.size() - 2];
+    if (secondLast != token_type::CONST) {
+        return false;
+    }
+
+    return true;
+}
+
 bool check_qualcomb(std::vector<int>& vec1, std::vector<int>& vec2) {
+    if (check_const_left_brackets(vec1)) {
+        std::cout << "here" << std::endl;
+        return false;
+    }
+
+    if (check_right_brackets(vec2)) {
+        return false;
+    }
+
     if (type_checker(vec1) || type_checker(vec2)) {
         return false;
     }
@@ -158,10 +198,6 @@ bool check_qualcomb(std::vector<int>& vec1, std::vector<int>& vec2) {
 bool my_testqual(const std::string& str1, const std::string& str2) {
     auto vec1 = parse_str(str1);
     auto vec2 = parse_str(str2);
-
-    if (vec1 == vec2) {
-        return true;
-    }
 
     return check_qualcomb(vec1, vec2);
 }

@@ -11,6 +11,12 @@ make tq.out
 ./tq.out "const char **" "char **"
 ```
 
+For generated tests run, use (takes approximately less than a minute):
+
+```bash
+make test_generated
+```
+
 In this task such a function should be written, that checks if conversion can be done for different types.
 Types are presented as strings that can include `const`, `char`, `[]` and `*`.
 
