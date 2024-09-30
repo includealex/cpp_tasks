@@ -12,7 +12,7 @@ namespace COW {
 template<typename CharT>
 class my_str_COW final {
  public:
-    my_str_COW() : _buff{std::make_shared<storage>(1)}, _begin{0}, _end{0} {
+    my_str_COW() : _begin{0}, _end{0}, _buff{std::make_shared<storage>(1)} {
         (*_buff)[0] = '\0';  // null-terminate empty cow string
     }
 
@@ -109,7 +109,10 @@ class my_str_COW final {
             throw std::out_of_range("Substring is longer than the string.");
         }
 
-        auto concat_str = substr.concat(*this);
+        const my_str_COW<CharT> dollar_sign {"$"};
+        auto pre_str = substr.concat(dollar_sign);
+
+        auto concat_str = pre_str.concat(*this);
         std::vector<std::size_t> z(concat_str.size(), 0);
         std::size_t l = 0, r = 0;
 
@@ -128,7 +131,7 @@ class my_str_COW final {
             }
 
             if (z[i] == substr.size()) {
-                result.push_back(i - substr.size());
+                result.push_back(i - substr.size() - 1);
             }
         }
 
@@ -168,7 +171,7 @@ class my_str_COW final {
     }
 
     friend std::ostream& operator<<(std::ostream& os, const my_str_COW& str) {
-        for(auto i = 0; i < str.size(); ++i) {
+        for(size_t i = 0; i < str.size(); ++i) {
             os << str[i];
         }
 

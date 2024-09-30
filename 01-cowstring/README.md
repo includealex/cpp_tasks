@@ -1,11 +1,21 @@
-To run, try this:
+If you want to run tests, just do:
 
 ```bash
-make run_simplest
+cmake -B build -GNinja
+ninja -C build run_cow_test -j $(nproc)
 ```
 
-For `valgrind` check, try this:
+For simplest program presented in `main.cpp` try run:
 
 ```bash
-make valgrind_check
+cmake -B build -GNinja
+ninja -C build run_simplest
 ```
+
+For memory leaks check, use this:
+
+```bash
+cmake -B build -GNinja -DSANITIZERS=1
+ninja -C build run_simplest
+```
+
