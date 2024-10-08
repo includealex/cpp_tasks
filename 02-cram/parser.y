@@ -50,6 +50,12 @@ program:
     ;
 
 statement:
+    input_s
+    | assignment_s
+    | print_s
+    ;
+
+input_s:
     INPUT L_BRACKET {
         input(c);
     }
@@ -59,7 +65,20 @@ statement:
     | INPUT IDENTIFIER {
         input(variables[$2]);
     }
-    | L_BRACKET ASSIGN expression {
+
+print_s:
+    PRINT expression { 
+        print($2);
+    }
+    | PRINT L_BRACKET expression R_BRACKET {
+        print(memory[$3]);
+    }
+    | PRINT IDENTIFIER L_BRACKET expression R_BRACKET {
+        print(memory[variables[$2] + $4]);
+    }
+
+assignment_s:
+    L_BRACKET ASSIGN expression {
         c = $3;
     }
     | L_BRACKET ASSIGN L_BRACKET expression R_BRACKET {
@@ -86,16 +105,6 @@ statement:
     | IDENTIFIER ASSIGN IDENTIFIER L_BRACKET expression R_BRACKET {
         variables[$1] = (memory[variables[$3] + $5]);
     }
-    | PRINT expression { 
-        print($2);
-    }
-    | PRINT L_BRACKET expression R_BRACKET {
-        print(memory[$3]);
-    }
-    | PRINT IDENTIFIER L_BRACKET expression R_BRACKET {
-        print(memory[variables[$2] + $4]);
-    }
-    ;
 
 expression:
     term {
