@@ -6,7 +6,7 @@ extern std::vector<int> memory;
 
 int main() {
     for (int i = 0; i < memory.size(); ++i) {
-        memory[i] = i + 1000;
+        memory[i] = i * 2;
     }
 
     std::cout << "Welcome to the [RAM Interpreter!" << std::endl;

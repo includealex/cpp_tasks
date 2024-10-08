@@ -62,14 +62,29 @@ statement:
     | L_BRACKET ASSIGN expression {
         c = $3;
     }
+    | L_BRACKET ASSIGN L_BRACKET expression R_BRACKET {
+        c = memory[$4];
+    }
+    | L_BRACKET ASSIGN IDENTIFIER L_BRACKET expression R_BRACKET {
+        c = memory[variables[$3] + $5];
+    }
     | R_BRACKET L_BRACKET ASSIGN expression {
         x = $4;
+    }
+    | R_BRACKET L_BRACKET ASSIGN L_BRACKET expression R_BRACKET {
+        x = memory[$5];
+    }
+    | R_BRACKET L_BRACKET ASSIGN IDENTIFIER L_BRACKET expression R_BRACKET {
+        x = memory[variables[$4] + $6];
     }
     | IDENTIFIER ASSIGN expression {
         variables[$1] = $3;
     }
     | IDENTIFIER ASSIGN L_BRACKET expression R_BRACKET {
         variables[$1] = memory[$4];
+    }
+    | IDENTIFIER ASSIGN IDENTIFIER L_BRACKET expression R_BRACKET {
+        variables[$1] = (memory[variables[$3] + $5]);
     }
     | PRINT expression { 
         print($2);
