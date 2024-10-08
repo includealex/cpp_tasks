@@ -68,6 +68,9 @@ statement:
     | IDENTIFIER ASSIGN expression {
         variables[$1] = $3;
     }
+    | IDENTIFIER ASSIGN L_BRACKET expression R_BRACKET {
+        variables[$1] = memory[$4];
+    }
     | PRINT expression { 
         print($2);
     }
