@@ -1,10 +1,12 @@
 %{
-#include <iostream>
-#include <vector>
-#include <string>
 #include <cstdlib>
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
 
 std::vector<int> memory(1000);
+std::map<std::string, int> variables;
 
 int c = 0; // is  [ synonym
 int x = 0; // is ][ synonym
@@ -27,12 +29,15 @@ void yyerror(const char* s);
 %token <ival> NUMBER 
 %token INPUT PRINT PLUS MINUS ASSIGN SEMICOLON
 %token L_BRACKET R_BRACKET
+%token IDENTIFIER
 
 %union {
     int ival;
+    char* sval;
 }
 
 %type <ival> expression term
+%type <sval> IDENTIFIER
 
 %precedence ASSIGN
 %precedence PLUS MINUS
@@ -45,29 +50,60 @@ program:
     ;
 
 statement:
-    INPUT L_BRACKET { input(c); }
-    | INPUT R_BRACKET L_BRACKET { input(x); }
+    INPUT L_BRACKET {
+        input(c);
+    }
+    | INPUT R_BRACKET L_BRACKET {
+        input(x);
+    }
+    | INPUT IDENTIFIER {
+        input(variables[$2]);
+    }
     | L_BRACKET ASSIGN expression {
         c = $3;
     }
     | R_BRACKET L_BRACKET ASSIGN expression {
         x = $4;
     }
+    | IDENTIFIER ASSIGN expression {
+        variables[$1] = $3;
+    }
     | PRINT expression { 
         print($2);
+    }
+    | PRINT L_BRACKET expression R_BRACKET {
+        print(memory[$3]);
+    }
+    | PRINT IDENTIFIER L_BRACKET expression R_BRACKET {
+        print(memory[variables[$2] + $4]);
     }
     ;
 
 expression:
-    term { $$ = $1; }
-    | expression PLUS term { $$ = $1 + $3; }
-    | expression MINUS term { $$ = $1 - $3; }
+    term {
+        $$ = $1;
+    }
+    | expression PLUS term {
+        $$ = $1 + $3;
+    }
+    | expression MINUS term {
+        $$ = $1 - $3;
+    }
     ;
 
 term:
-    NUMBER { $$ = $1; }
-    | L_BRACKET { $$ = c; }
-    | R_BRACKET L_BRACKET { $$ = x; }
+    NUMBER {
+        $$ = $1;
+    }
+    | L_BRACKET {
+        $$ = c;
+    }
+    | R_BRACKET L_BRACKET {
+        $$ = x;
+    }
+    | IDENTIFIER {
+        $$ = variables[$1];
+    }
     ;
 
 %% 

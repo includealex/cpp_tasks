@@ -5,4 +5,12 @@ input ][;
 ][ = 10;
 
 print [ + ][ + 1;
+print[6];
+
+input a;
+a = 4;
+b = 3;
+print a;
+print [a];
+print a[b];
 

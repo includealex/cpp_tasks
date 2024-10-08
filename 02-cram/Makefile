@@ -18,7 +18,7 @@ $(LEXER_OUTPUT): $(LEXER)
 	$(FLEX) $(LEXER)
 
 $(PARSER_OUTPUT): $(PARSER)
-	$(BISON) -d $(PARSER)
+	$(BISON) -d $(PARSER) -Wcounterexamples
 
 $(EXECUTABLE): $(LEXER_OUTPUT) $(PARSER_OUTPUT) main.cpp
 	$(CXX) $(CXXFLAGS) -o $(EXECUTABLE) main.cpp lex.yy.c parser.tab.c
