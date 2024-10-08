@@ -26,7 +26,7 @@ void yyerror(const char* s);
 
 %token <ival> NUMBER 
 %token INPUT PRINT PLUS MINUS ASSIGN SEMICOLON
-%token C_VAR X_VAR
+%token L_BRACKET R_BRACKET
 
 %union {
     int ival;
@@ -45,13 +45,13 @@ program:
     ;
 
 statement:
-    INPUT C_VAR { input(c); }
-    | INPUT X_VAR { input(x); }
-    | C_VAR ASSIGN expression { 
+    INPUT L_BRACKET { input(c); }
+    | INPUT R_BRACKET L_BRACKET { input(x); }
+    | L_BRACKET ASSIGN expression {
         c = $3;
     }
-    | X_VAR ASSIGN expression { 
-        x = $3;
+    | R_BRACKET L_BRACKET ASSIGN expression {
+        x = $4;
     }
     | PRINT expression { 
         print($2);
@@ -66,8 +66,8 @@ expression:
 
 term:
     NUMBER { $$ = $1; }
-    | C_VAR { $$ = c; }
-    | X_VAR { $$ = x; }
+    | L_BRACKET { $$ = c; }
+    | R_BRACKET L_BRACKET { $$ = x; }
     ;
 
 %% 
