@@ -1,33 +1,37 @@
+# Compiler and flags
 CXX = g++
-CXXFLAGS = -O3
+CXXFLAGS = -lfl
 
-FLEX = flex
-BISON = bison
+# Source files
+MAIN_SRC = main.cpp
+LEX_SRC = lex.yy.c
+PARSER_SRC = parser.cpp
+GLOBAL_SRC = globals.cpp  # Add globals.cpp to the sources
 
-LEXER = lexer.l
-PARSER = parser.y
-PARSER_OUTPUT = parser.tab.c parser.tab.h
-LEXER_OUTPUT = lex.yy.c
+# Executable
 EXECUTABLE = interpreter.out
-INPUT_FILE = input.cram
-OBJECTS = main.o lex.yy.o parser.tab.o
 
+# Input file
+INPUT_FILE = input.cram
+
+# Targets
+.PHONY: all clean run_simplest
+
+# Default target to build the executable
 all: $(EXECUTABLE)
 
-$(LEXER_OUTPUT): $(LEXER)
-	$(FLEX) $(LEXER)
+# Rule to build the executable
+$(EXECUTABLE): $(MAIN_SRC) $(LEX_SRC) $(PARSER_SRC) $(GLOBAL_SRC)
+	$(CXX) -o $(EXECUTABLE) $(MAIN_SRC) $(LEX_SRC) $(PARSER_SRC) $(GLOBAL_SRC) $(CXXFLAGS)
 
-$(PARSER_OUTPUT): $(PARSER)
-	$(BISON) -d $(PARSER) -Wcounterexamples
+# Rule to generate lex.yy.c from lexer.l
+$(LEX_SRC): lexer.l
+	flex lexer.l
 
-$(EXECUTABLE): $(LEXER_OUTPUT) $(PARSER_OUTPUT) main.cpp
-	$(CXX) $(CXXFLAGS) -o $(EXECUTABLE) main.cpp lex.yy.c parser.tab.c
+# Rule to run the simplest interpreter with input file
+run_simplest: all
+	./$(EXECUTABLE) $(INPUT_FILE)
 
-run_simplest: $(EXECUTABLE)
-	./$(EXECUTABLE) < $(INPUT_FILE)
-
+# Clean up generated files
 clean:
-	rm -f $(EXECUTABLE) $(LEXER_OUTPUT) $(PARSER_OUTPUT) *.o
-
-rebuild: clean all
-
+	rm -f $(EXECUTABLE) $(LEX_SRC) lex.yy.c *.o

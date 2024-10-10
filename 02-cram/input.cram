@@ -1,6 +1,15 @@
 input a;
-a = 2;
-[ = a[5];
-][ = [ [+a-2 ]; 
-a = [ [+][ ]; 
+2
 print a;
+
+input [;
+6
+print [;
+
+input ][;
+10
+print ][;
+
+print [8];
+
+print [a];
