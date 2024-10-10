@@ -1,8 +1,9 @@
 #include <iostream>
 #include <vector>
 
-extern int yyparse();
-extern std::vector<int> memory;
+#include "parser.hpp"
+
+std::vector<int> memory(100);
 
 int main() {
     for (int i = 0; i < memory.size(); ++i) {
