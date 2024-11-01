@@ -6,86 +6,105 @@
 namespace custom {
 
 template<typename T>
-PermanentSet<T>::PermanentSet() : _root(nullptr) {}
-
-template<typename T>
-PermanentSet<T>::~PermanentSet() {
-    clear(_root);
+PermSet<T>::PermSet() : _root(nullptr), _version(0) {
+    _history.push_back(_root);
 }
 
 template <typename T>
-void PermanentSet<T>::clear(Node<T>* node) {
-    if (node == nullptr) return;
-    clear(node->left);
-    clear(node->right);
-    delete node;
+void PermSet<T>::insert(const T& value) {
+    _root = insert(_root, value);
+    record();
+}
+
+template <typename T>
+std::shared_ptr<Node<T>> PermSet<T>::insert(const std::shared_ptr<Node<T>>& node, const T& value) {
+    if (!node) {
+        return std::make_shared<Node<T>>(value);
+    }
+
+    if (value == node->data) {
+        return node;
+    }
+
+    auto newNode = std::make_shared<Node<T>>(node->data);
+
+    if (value < node->data) {
+        newNode->left = insert(node->left, value);
+        newNode->right = node->right;
+    }
+    else {
+        newNode->right = insert(node->right, value);
+        newNode->left = node->left;
+    }
+
+    return newNode;
 }
 
 template<typename T>
-void PermanentSet<T>::insert(const T& value) {
-    if (_root == nullptr) {
-        _root = new Node<T>(value);
-        return;
-    }
-
-    Node<T>* current = _root;
-    Node<T>* parent = nullptr;
-
-    while (current != nullptr) {
-        parent = current;
-        if (value < current->data) {
-            current = current->left;
-        } else if (value > current->data) {
-            current = current->right;
-        } else {
-            return;
-        }
-    }
-
-    if (value < parent->data) {
-        parent->left = new Node<T>(value);
-    } else {
-        parent->right = new Node<T>(value);
-    }
-}
-
-template<typename T>
-bool PermanentSet<T>::contains(const T& value) const {
+bool PermSet<T>::contains(const T& value) const {
     return contains(_root, value);
 }
 
-template<typename T>
-bool PermanentSet<T>::contains(Node<T>* node, const T& value) const {
-    while (node != nullptr) {
-        if (value == node->data) {
+template <typename T>
+bool PermSet<T>::contains(const std::shared_ptr<Node<T>>& node, const T& value) const {
+    auto cur = node;
+    while (cur != nullptr) {
+        if (value == cur->data) {
             return true;
-        } else if (value < node->data) {
-            node = node->left;
-        } else {
-            node = node->right;
+        }
+
+        if (value < cur->data) {
+            cur = cur->left;
+        } 
+        else {
+            cur = cur->right;
         }
     }
     return false;
 }
 
 template <typename T>
-std::vector<T> PermanentSet<T>::inorder() const {
-    std::vector<T> elements;
-    std::stack<Node<T>*> stack;
-    Node<T>* current = _root;
+void PermSet<T>::record() {
+    if (_version < static_cast<int>(_history.size()) - 1) {
+        _history.resize(_version + 1);
+    }
+    _history.push_back(_root);
+    _version++;
+}
 
-    while (current != nullptr || !stack.empty()) {
-        while (current != nullptr) {
-            stack.push(current);
-            current = current->left;
+template <typename T>
+void PermSet<T>::undo() {
+    if (_version > 0) {
+        _version--;
+        _root = _history[_version];
+    }
+}
+
+template <typename T>
+void PermSet<T>::redo() {
+    if (_version < static_cast<int>(_history.size()) - 1) {
+        _version++;
+        _root = _history[_version];
+    }
+}
+
+template <typename T>
+std::vector<T> PermSet<T>::inorder() const {
+    std::vector<T> elements;
+    std::stack<std::shared_ptr<Node<T>>> stack;
+    auto cur = _root;
+
+    while (cur != nullptr || !stack.empty()) {
+        while (cur != nullptr) {
+            stack.push(cur);
+            cur = cur->left;
         }
 
-        current = stack.top();
+        cur = stack.top();
         stack.pop();
 
-        elements.push_back(current->data);
-
-        current = current->right;
+        elements.push_back(cur->data);
+        cur = cur->right;
     }
 
     return elements;
@@ -94,4 +113,3 @@ std::vector<T> PermanentSet<T>::inorder() const {
 } // namespace custom
 
 #endif //PERMSET_IMPL_HPP_
-
