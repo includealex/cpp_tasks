@@ -2,6 +2,7 @@
 #define INCLUDES_PERMSET_HPP_
 
 #include <iostream>
+#include <stack>
 #include <vector>
 
 namespace custom {
@@ -23,18 +24,13 @@ class PermanentSet {
 
     void insert(const T& value);
     bool contains(const T& value) const;
-    std::vector<T> inOrderTraversal() const;
+    std::vector<T> inorder() const;
 
-    void printInOrder() const;
  private:
     Node<T>* _root;
+
     void clear(Node<T>* node);
-
-    Node<T>* insert(Node<T>* node, const T& value);
     bool contains(Node<T>* node, const T& value) const;
-
-    void inOrderTraversalHelper(Node<T>* node, std::vector<T>& elements) const;
-    void inOrder(Node<T>* node) const;
 };
 
 } //namespace custom

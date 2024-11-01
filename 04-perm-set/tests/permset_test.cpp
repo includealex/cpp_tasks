@@ -28,7 +28,7 @@ TEST(PermSetTest, DuplicateInsertion) {
     EXPECT_FALSE(set.contains(20));
 }
 
-TEST(PermSetTest, InOrderTraversalMultipleElements) {
+TEST(PermSetTest, inorderMultipleElements) {
     custom::PermanentSet<int> set;
 
     set.insert(10);
@@ -38,26 +38,26 @@ TEST(PermSetTest, InOrderTraversalMultipleElements) {
     set.insert(2);
 
     std::vector<int> expected = {2, 5, 7, 10, 15};
-    EXPECT_EQ(set.inOrderTraversal(), expected);
+    EXPECT_EQ(set.inorder(), expected);
 }
 
-TEST(PermSetTest, InOrderTraversalSingleElement) {
+TEST(PermSetTest, inorderSingleElement) {
     custom::PermanentSet<int> set;
 
     set.insert(10);
 
     std::vector<int> expected = {10};
-    EXPECT_EQ(set.inOrderTraversal(), expected);
+    EXPECT_EQ(set.inorder(), expected);
 }
 
-TEST(PermSetTest, InOrderTraversalEmptySet) {
+TEST(PermSetTest, inorderEmptySet) {
     custom::PermanentSet<int> set;
 
     std::vector<int> expected = {};
-    EXPECT_EQ(set.inOrderTraversal(), expected);
+    EXPECT_EQ(set.inorder(), expected);
 }
 
-TEST(PermSetTest, InOrderTraversalWithDuplicates) {
+TEST(PermSetTest, inorderWithDuplicates) {
     custom::PermanentSet<int> set;
 
     set.insert(10);
@@ -67,7 +67,7 @@ TEST(PermSetTest, InOrderTraversalWithDuplicates) {
     set.insert(5);
 
     std::vector<int> expected = {5, 10, 15};
-    EXPECT_EQ(set.inOrderTraversal(), expected);
+    EXPECT_EQ(set.inorder(), expected);
 }
 
 } // namespace custom

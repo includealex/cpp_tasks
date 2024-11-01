@@ -1,3 +1,6 @@
+#ifndef PERMSET_IMPL_HPP_
+#define PERMSET_IMPL_HPP_
+
 #include "permset.hpp"
 
 namespace custom {
@@ -10,9 +13,40 @@ PermanentSet<T>::~PermanentSet() {
     clear(_root);
 }
 
+template <typename T>
+void PermanentSet<T>::clear(Node<T>* node) {
+    if (node == nullptr) return;
+    clear(node->left);
+    clear(node->right);
+    delete node;
+}
+
 template<typename T>
 void PermanentSet<T>::insert(const T& value) {
-    _root = insert(_root, value);
+    if (_root == nullptr) {
+        _root = new Node<T>(value);
+        return;
+    }
+
+    Node<T>* current = _root;
+    Node<T>* parent = nullptr;
+
+    while (current != nullptr) {
+        parent = current;
+        if (value < current->data) {
+            current = current->left;
+        } else if (value > current->data) {
+            current = current->right;
+        } else {
+            return;
+        }
+    }
+
+    if (value < parent->data) {
+        parent->left = new Node<T>(value);
+    } else {
+        parent->right = new Node<T>(value);
+    }
 }
 
 template<typename T>
@@ -22,67 +56,42 @@ bool PermanentSet<T>::contains(const T& value) const {
 
 template<typename T>
 bool PermanentSet<T>::contains(Node<T>* node, const T& value) const {
-    if (node == nullptr) {
-        return false;
+    while (node != nullptr) {
+        if (value == node->data) {
+            return true;
+        } else if (value < node->data) {
+            node = node->left;
+        } else {
+            node = node->right;
+        }
     }
-    if (value == node->data) {
-        return true;
-    } else if (value < node->data) {
-        return contains(node->left, value);
-    } else {
-        return contains(node->right, value);
-    }
+    return false;
 }
 
 template <typename T>
-void PermanentSet<T>::printInOrder() const {
-    inOrder(_root);
-    std::cout << std::endl;
-}
-
-template <typename T>
-Node<T>* PermanentSet<T>::insert(Node<T>* node, const T& value) {
-    if (node == nullptr) {
-        return new Node(value);
-    }
-    if (value < node->data) {
-        node->left = insert(node->left, value);
-    } else if (value > node->data) {
-        node->right = insert(node->right, value);
-    }
-
-    return node;
-}
-
-template <typename T>
-void PermanentSet<T>::inOrder(Node<T>* node) const {
-    if (node == nullptr) return;
-    inOrder(node->left);
-    std::cout << node->data << " ";
-    inOrder(node->right);
-}
-
-template <typename T>
-void PermanentSet<T>::clear(Node<T>* node) {
-    if (node == nullptr) return;
-    clear(node->left);
-    clear(node->right);
-    delete node;
-}
-
-template <typename T>
-std::vector<T> PermanentSet<T>::inOrderTraversal() const {
+std::vector<T> PermanentSet<T>::inorder() const {
     std::vector<T> elements;
-    inOrderTraversalHelper(_root, elements);
+    std::stack<Node<T>*> stack;
+    Node<T>* current = _root;
+
+    while (current != nullptr || !stack.empty()) {
+        while (current != nullptr) {
+            stack.push(current);
+            current = current->left;
+        }
+
+        current = stack.top();
+        stack.pop();
+
+        elements.push_back(current->data);
+
+        current = current->right;
+    }
+
     return elements;
 }
 
-template <typename T>
-void PermanentSet<T>::inOrderTraversalHelper(Node<T>* node, std::vector<T>& elements) const {
-    if (node == nullptr) return;
-    inOrderTraversalHelper(node->left, elements);
-    elements.push_back(node->data);
-    inOrderTraversalHelper(node->right, elements);
-}
-
 } // namespace custom
+
+#endif //PERMSET_IMPL_HPP_
+
