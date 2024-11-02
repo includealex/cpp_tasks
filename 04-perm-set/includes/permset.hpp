@@ -17,7 +17,7 @@ struct Node final{
     Node(const T& value) : data(value), left(nullptr), right(nullptr) {}
 };
 
-class string_twine {
+class string_twine final{
  public:
     string_twine(const std::string& value) : _left(nullptr), _right(nullptr), _value(value) {}
     string_twine(std::shared_ptr<string_twine> left, std::shared_ptr<string_twine> right)
@@ -46,7 +46,6 @@ class string_twine {
     std::string _value;
 };
 
-
 template <typename T>
 class PermSet final{
  public:
@@ -71,7 +70,7 @@ class PermSet final{
 };
 
 template <>
-class PermSet<std::string> final {
+class PermSet<std::string> {
  public:
     PermSet();
     ~PermSet() = default;
@@ -83,15 +82,14 @@ class PermSet<std::string> final {
     std::vector<std::string> inorder() const;
 
  private:
-    std::shared_ptr<Node<std::shared_ptr<string_twine>>> _root;
-    std::vector<std::shared_ptr<Node<std::shared_ptr<string_twine>>>> _history;
+    using str_node = std::shared_ptr<Node<std::shared_ptr<string_twine>>>; 
+
+    str_node _root;
+    std::vector<str_node> _history;
     int _version;
 
-    std::shared_ptr<Node<std::shared_ptr<string_twine>>>
-    insert(const std::shared_ptr<Node<std::shared_ptr<string_twine>>>& node, 
-           const std::shared_ptr<string_twine>& value);
-    bool contains(const std::shared_ptr<Node<std::shared_ptr<string_twine>>>& node,
-                  const std::shared_ptr<string_twine>& value) const;
+    str_node insert(const str_node& node, const std::shared_ptr<string_twine>& value);
+    bool contains(const str_node& node, const std::shared_ptr<string_twine>& value) const;
     void record();
 };
 

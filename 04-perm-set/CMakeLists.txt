@@ -8,6 +8,7 @@ add_library(my_permset STATIC ${ALL_CXX_SOURCE_FILES})
 target_include_directories(my_permset PUBLIC includes/)
 
 add_subdirectory(tests)
+add_subdirectory(benchmarks)
 
 set_target_properties (my_permset PROPERTIES
     CXX_STANDARD          17

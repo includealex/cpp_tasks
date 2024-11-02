@@ -121,8 +121,7 @@ void PermSet<std::string>::insert(const std::string& value) {
 }
 
 std::shared_ptr<Node<std::shared_ptr<string_twine>>>
-PermSet<std::string>::insert(const std::shared_ptr<Node<std::shared_ptr<string_twine>>>& node,
-                             const std::shared_ptr<string_twine>& value) {
+PermSet<std::string>::insert(const str_node& node, const std::shared_ptr<string_twine>& value) {
     if (!node) {
         return std::make_shared<Node<std::shared_ptr<string_twine>>>(value);
     }
@@ -149,8 +148,7 @@ bool PermSet<std::string>::contains(const std::string& value) const {
     return contains(_root, twine_value);
 }
 
-bool PermSet<std::string>::contains(const std::shared_ptr<Node<std::shared_ptr<string_twine>>>& node,
-                                    const std::shared_ptr<string_twine>& value) const {
+bool PermSet<std::string>::contains(const str_node& node, const std::shared_ptr<string_twine>& value) const {
     auto cur = node;
     auto str_val = value->str();
     while (cur != nullptr) {
@@ -193,7 +191,7 @@ void PermSet<std::string>::redo() {
 
 std::vector<std::string> PermSet<std::string>::inorder() const {
     std::vector<std::string> elements;
-    std::stack<std::shared_ptr<Node<std::shared_ptr<string_twine>>>> stack;
+    std::stack<str_node> stack;
     auto cur = _root;
 
     while (cur != nullptr || !stack.empty()) {
