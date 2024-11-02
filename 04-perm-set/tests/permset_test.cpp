@@ -132,6 +132,89 @@ TEST(PermSetTest, LargeInsertionAndUndoRedo) {
     EXPECT_EQ(afterRedoInorder, elements);
 }
 
+TEST(PermSetStringTest, InsertAndContains) {
+    custom::PermSet<std::string> set;
+
+    set.insert("apple");
+    set.insert("banana");
+    set.insert("cherry");
+
+    EXPECT_TRUE(set.contains("apple"));
+    EXPECT_TRUE(set.contains("banana"));
+    EXPECT_TRUE(set.contains("cherry"));
+    EXPECT_FALSE(set.contains("durian"));
+}
+
+TEST(PermSetStringTest, DuplicateInsertion) {
+    custom::PermSet<std::string> set;
+
+    set.insert("apple");
+    set.insert("apple");
+    set.insert("banana");
+
+    EXPECT_TRUE(set.contains("apple"));
+    EXPECT_TRUE(set.contains("banana"));
+    EXPECT_FALSE(set.contains("cherry"));
+}
+
+TEST(PermSetStringTest, InorderStrings) {
+    custom::PermSet<std::string> set;
+
+    set.insert("banana");
+    set.insert("apple");
+    set.insert("cherry");
+
+    std::vector<std::string> expected = {"apple", "banana", "cherry"};
+    EXPECT_EQ(set.inorder(), expected);
+}
+
+TEST(PermSetStringTest, InsertUndoRedo) {
+    custom::PermSet<std::string> set;
+
+    set.insert("apple");
+    set.insert("banana");
+    set.insert("cherry");
+
+    EXPECT_EQ(set.inorder(), (std::vector<std::string>{"apple", "banana", "cherry"}));
+
+    set.undo();
+    EXPECT_EQ(set.inorder(), (std::vector<std::string>{"apple", "banana"}));
+
+    set.redo();
+    EXPECT_EQ(set.inorder(), (std::vector<std::string>{"apple", "banana", "cherry"}));
+
+    set.insert("durian");
+    EXPECT_EQ(set.inorder(), (std::vector<std::string>{"apple", "banana", "cherry", "durian"}));
+
+    set.undo();
+    EXPECT_EQ(set.inorder(), (std::vector<std::string>{"apple", "banana", "cherry"}));
+}
+
+TEST(PermSetStringTest, LargeInsertionAndUndoRedo) {
+    custom::PermSet<std::string> set;
+    std::vector<std::string> elements;
+
+    int big_num = 1e3;
+    for (int i = 0; i < big_num; ++i) {
+        std::string str = "string_" + std::to_string(i);
+        set.insert(str);
+        elements.push_back(str);
+    }
+
+    std::sort(elements.begin(), elements.end());
+    
+    std::vector<std::string> initialInorder = set.inorder();
+    EXPECT_EQ(initialInorder, elements);
+
+    set.undo();
+    std::vector<std::string> afterUndoInorder = set.inorder();
+    EXPECT_EQ(afterUndoInorder, std::vector<std::string>(elements.begin(), elements.end() - 1));
+
+    set.redo();
+    std::vector<std::string> afterRedoInorder = set.inorder();
+    EXPECT_EQ(afterRedoInorder, elements);
+}
+
 } // namespace custom
 
 int main(int argc, char **argv) {
