@@ -10,7 +10,7 @@ TEST(MetalSortTest, Simple) {
     struct z { char c; int32_t i; };
 
     using l3 = metal::list<char, int32_t, y, uint64_t, x>;
-    using sorted = metal::sort<l3, metal::lambda<smaller>>;
+    using sorted = stable_sort<l3>;
     using expected = metal::list<char, y, int32_t, uint64_t, x>;
 
     static_assert(metal::same<sorted, expected>::value);
