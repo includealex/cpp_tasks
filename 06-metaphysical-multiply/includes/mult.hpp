@@ -1,14 +1,5 @@
 #ifndef MULT_HPP_
 #define MULT_HPP_
-
-#include <array>
-#include <cassert>
-#include <type_traits>
-#include <tuple>
-#include <utility>
-#include <iostream>
-#include <string>
-
 namespace custom {
 
 template <int M, int K, int S>
@@ -37,9 +28,6 @@ struct Uminus {
 
 template <typename U1, typename U2>
 using Unit_minus = typename Uminus<U1, U2>::type;
-
-template <typename U>
-using Unit_negate = typename Uminus<Unit<0, 0, 0>, U>::type;
 
 template <typename U, typename V = double>
 struct Value {
