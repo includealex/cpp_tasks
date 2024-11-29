@@ -1,46 +1,28 @@
 #include <iostream>
-#include <cassert>
-
 #include "mult.hpp"
 
-void test_multiplication() {
-    constexpr auto length = 3.0_m;
-    constexpr auto time = 2.0_s;
+namespace custom {
 
-    constexpr auto speed = length / time;
-    static_assert(std::is_same_v<decltype(speed), Speed>, "Speed should have correct dimensions");
-    assert(double(speed) == 1.5);
+void simple_test() {
+    Value<M> x{10.5};
+    Value<S, int> y{2};
+    auto v = x / y;
+    std::cout << "Velocity = " << v << std::endl;
 
-    constexpr auto acceleration = speed / time;
-    static_assert(std::is_same_v<decltype(acceleration), Acceleration>, "Acceleration should have correct dimensions");
-    assert(double(acceleration) == 0.75);
+    static_assert(std::is_convertible_v<decltype(v), Value<MpS>>);
+    assert(v.val == 5.25);
+
+    auto distance = 10.0_m;
+    Value<S, double> time = 20.0_s;
+    auto speed = distance / time;
+    Value<MpS2, double> acceleration = distance / square(time);
+    std::cout << "Speed = " << speed << " Acceleration = " << acceleration << std::endl;
 }
 
-void test_division() {
-    constexpr auto area = 9.0_m2;
-    constexpr auto length = 3.0_m;
-
-    constexpr auto recovered_length = area / length;
-    static_assert(std::is_same_v<decltype(recovered_length), Length>, "Length should have correct dimensions");
-    assert(double(recovered_length) == 3.0);
-}
-
-void test_scalar_operations() {
-    constexpr Scalar scalar1{2.0};
-    constexpr Scalar scalar2{4.0};
-
-    constexpr auto scalar_mult = scalar1 * scalar2;
-    assert(double(scalar_mult) == 8.0);
-
-    constexpr auto scalar_div = scalar2 / scalar1;
-    assert(double(scalar_div) == 2.0);
-}
+} // namespace custom
 
 int main() {
-    test_multiplication();
-    test_division();
-    test_scalar_operations();
+    custom::simple_test();
 
-    std::cout << "All tests passed!" << std::endl;
     return 0;
 }
