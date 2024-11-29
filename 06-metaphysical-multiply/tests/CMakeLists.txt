@@ -6,10 +6,10 @@ include_directories(${GTEST_INCLUDE_DIRECTORIES})
 
 enable_testing()
 
-file(GLOB_RECURSE PERMSET_TEST_SRC *.cpp)
+file(GLOB_RECURSE PHYSMULT_TEST_SRC *.cpp)
 set(EXEC_NAME physmul_test)
 
-add_executable(${EXEC_NAME} ${PERMSET_TEST_SRC})
+add_executable(${EXEC_NAME} ${PHYSMULT_TEST_SRC})
 
 if(SANITIZERS)
 	target_compile_options(${EXEC_NAME} PUBLIC -fsanitize=address -g)
