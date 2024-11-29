@@ -64,67 +64,17 @@ constexpr Value<M, long double> operator"" _m(long double value) {
     return Value<M, long double>{value};
 }
 
-constexpr Value<M, long double> operator"" _km(long double value) {
-    return Value<M, long double>{1000 * value};
-}
-
 constexpr Value<Kg, long double> operator"" _kg(long double value) {
     return Value<Kg, long double>{value};
-}
-
-constexpr Value<Kg, long double> operator"" _g(long double value) {
-    return Value<Kg, long double>{value / 1000};
 }
 
 constexpr Value<S, long double> operator"" _s(long double value) {
     return Value<S, long double>{value};
 }
 
-constexpr Value<S, long double> operator"" _h(long double value) {
-    return Value<S, long double>{3600 * value};
-}
-
-template <typename U, typename V>
-Value<Unit_plus<U, U>, V> square(Value<U, V> x) {
-    return Value<Unit_plus<U, U>, V>(x.val * x.val);
-}
-
 template <typename U, typename V>
 bool operator==(Value<U, V> x, Value<U, V> y) {
     return x.val == y.val;
-}
-
-template <typename U, typename V>
-bool operator!=(Value<U, V> x, Value<U, V> y) {
-    return x.val != y.val;
-}
-
-template <typename U, typename V>
-bool operator<(Value<U, V> x, Value<U, V> y) {
-    return x.val < y.val;
-}
-
-template <typename U, typename V>
-bool operator>(Value<U, V> x, Value<U, V> y) {
-    return x.val > y.val;
-}
-
-std::string suffix(int u, const char* x) {
-    std::string suf;
-    if (u) {
-        suf += x;
-        if (1 < u) suf += '0' + u;
-        if (u < 0) {
-            suf += '-';
-            suf += '0' - u;
-        }
-    }
-    return suf;
-}
-
-template <typename U, typename V>
-std::ostream& operator<<(std::ostream& os, Value<U, V> v) {
-    return os << v.val << suffix(U::m, "m") << suffix(U::kg, "kg") << suffix(U::s, "s");
 }
 
 } // namespace custom
